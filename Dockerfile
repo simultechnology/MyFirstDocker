@@ -2,6 +2,9 @@ FROM centos:7
 
 MAINTAINER Takatsugu Ishikawa tissi0708@gmail.com
 
+ENV http_proxy http://10.254.254.180:3128
+ENV https_proxy http://10.254.254.180:3128
+
 # update yum
 RUN yum update -y && yum clean all
 
@@ -30,7 +33,7 @@ RUN yum install --enablerepo=remi -y gd-last && yum clean all
 RUN yum install --enablerepo=remi,remi-php56 -y php-pecl-memcached && yum clean all
 
 # php
-RUN yum install --enablerepo=remi-php56 -y php php-devel php-gd php-mbstring php-mcrypt php-mysqlnd php-pear php-xml php-opcache && \
+RUN yum install --enablerepo=remi-php56 -y php php-devel php-gd php-mbstring php-mcrypt php-mysqlnd php-pear php-xml php-pecl-xdebug php-opcache && \
     yum clean all && \
 	sed -i -e "s/;date.timezone *=.*$/date.timezone = Asia\/Tokyo/" /etc/php.ini
 
@@ -51,6 +54,7 @@ RUN useradd -d /home/www -m -s /bin/bash www && \
 # timezone
 RUN cp -p /usr/share/zoneinfo/Japan /etc/localtime
 
+
 #ENV WEBAPP_ROOT /webapp
 #
 #ADD ./httpd.conf /etc/httpd/conf/httpd.conf
@@ -58,4 +62,4 @@ RUN cp -p /usr/share/zoneinfo/Japan /etc/localtime
 #ADD ./phpinfo.php /webapp/public/phpinfo.php
 
 EXPOSE 22 80
-
+ENTRYPOINT ["/usr/sbin/httpd","-DFOREGROUND"]
